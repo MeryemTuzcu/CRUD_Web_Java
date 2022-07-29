@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Veri Bilgileri</title>
+        <meta charset="UTF-8">
+        <style>
+            table, th, td {
+                border: 5px solid teal;
+            }
+        </style>
+        <script>
+
+
+            var baseURL = "http://localhost:8080";
+
+
+            function verileriYukle(){
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("GET", baseURL + "/veriler", true);
+                xmlHttp.onreadystatechange = function (){
+                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200 ){
+
+                        var veriler = JSON.parse(xmlHttp.responseText);
+                        var tblTop = '<table style="width: 500px; "><tr><th>ID</th><th>AD</th><th>SOYAD</th><th>YAS</th><th>TELEFON</th><th>GÜNCELLE</th></tr>';
+                        var main = "";
+                        for(var i = 0; i < veriler.length; i++){
+
+                            main += "<tr>" +
+                                    "<td style='text-align: center'>" + veriler[i].id + "</td>" +
+                                    "<td style='text-align: center'> " + veriler[i].ad + "</td>" +
+                                    "<td style='text-align: center'> " + veriler[i].soyad + "</td>" +
+                                    "<td style='text-align: center'> " + veriler[i].yas + "</td>" +
+                                    "<td style='text-align: center'> " + veriler[i].telefon + "</td>" +
+                                    "<td style='text-align: center'>" +
+                                    "<button onclick=\"veriGuncelleAyari(" + veriler[i].id + ",\'" + veriler[i].ad + "\',\'" + veriler[i].soyad + "\'," + veriler[i].yas + ","+ veriler[i].telefon.trim() +")\">" + veriler[i].id + "'i GÜNCELLE</button>" + "</td>" +
+                                    "</tr>";
+                        }
+                        var tblBottom ="</table>";
+                        var tbl = tblTop + main + tblBottom;
+
+                        document.getElementById("veriBilgi").innerHTML = tbl;
+                    }
+                };
+                xmlHttp.send();
+            }
+
+            //window.onload = function (){
+            //  verileriYukle();
+            //}
+
+
+
+            function veriEkle(){
+
+                const parametreler = {
+                    ad: document.getElementById("ad").value,
+                    soyad: document.getElementById("soyad").value,
+                    telefon: document.getElementById("telefon").value,
+                    yas: document.getElementById("yas").value
+
+                }
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("POST", baseURL + "/veriekle", true);
+                xmlHttp.setRequestHeader('Content-type', 'application/json');
+                xmlHttp.onreadystatechange = function (){
+                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200 ){
+                        alert(xmlHttp.responseText) ;
+                        verileriYukle();
+                    }
+                };
+                xmlHttp.send(JSON.stringify(parametreler));
+            }
+
+            function veriSil(){
+                var xmlHttp = new XMLHttpRequest();
+                var endString = "?id=" + document.getElementById("id").value;
+                alert(endString);
+                xmlHttp.open("GET", baseURL + "/verisil"+ endString, true);
+                xmlHttp.onreadystatechange = function (){
+                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200 ){
+                        alert(xmlHttp.responseText) ;
+                        verileriYukle();
+                    }
+                };
+                xmlHttp.send();
+
+            }
+
+            function veriGuncelleAyari(id_deger, ad_deger, soyad_deger, yas_deger, telefon_deger){
+
+
+                document.getElementById("guncelid").value = id_deger;
+                document.getElementById("guncelad").value = ad_deger;
+                document.getElementById("guncelsoyad").value = soyad_deger;
+                document.getElementById("guncelyas").value = yas_deger;
+                document.getElementById("gunceltelefon").value = telefon_deger;
+            }
+
+            function veriGuncelle(){
+
+                const parametreler = {
+
+
+                    id: document.getElementById("guncelid").value,
+                    ad: document.getElementById("guncelad").value,
+                    soyad: document.getElementById("guncelsoyad").value,
+                    telefon: document.getElementById("gunceltelefon").value,
+                    yas: document.getElementById("guncelyas").value
+
+                }
+
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.open("POST", baseURL + "/veriguncelle", true);
+                xmlHttp.setRequestHeader('Content-type', 'application/json');
+                xmlHttp.onreadystatechange = function (){
+
+                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200 ){
+                        alert(xmlHttp.responseText) ;
+                        verileriYukle();
+                    }
+                };
+                xmlHttp.send(JSON.stringify(parametreler));
+
+            }
+
+            function veriAra(){
+                var xmlHttp = new XMLHttpRequest();
+
+                xmlHttp.open("GET", baseURL + "/veriara", true);
+                xmlHttp.onreadystatechange = function (){
+                    if(xmlHttp.readyState === 4 && xmlHttp.status === 200 ){
+                        console.log("1");
+                        var veriler = JSON.parse(xmlHttp.responseText);
+                        for(var i = 0; i < veriler.length; i++){
+
+                            main += "<tr>" +
+                                "<td style='text-align: center'>" + veriler[i].id + "</td>" +
+                                "<td style='text-align: center'> " + veriler[i].ad + "</td>" +
+                                "<td style='text-align: center'> " + veriler[i].soyad + "</td>" +
+                                "<td style='text-align: center'> " + veriler[i].yas + "</td>" +
+                                "<td style='text-align: center'> " + veriler[i].telefon + "</td>" +
+                                "<td style='text-align: center'>" +
+                                "</tr>";
+                        }
+
+
+                    }
+                };
+                const parametreler = document.getElementById("arananVeri").text;
+                xmlHttp.send(JSON.stringify(parametreler));
+
+           }
+
+
+
+
+        </script>
+
+
+    </head>
+    <body style="background: rosybrown">
+        <div id="veriler" style="width: 80%; height: 130%; margin: 70px; border: bisque 5px dashed">
+            <h3>VERİ İŞLEMLERİ</h3>
+            <h4>Hocam arama işlemi swaggerda çalışıyor html'e uyarlayamadım :)</h4>
+            <div id="veriListesi" style="border: aliceblue 5px solid">
+                <div id="deneme">
+                    <form  action="">
+                        Ad Arama Butonu
+
+                        <input type="text" id="arananVeri" name="anahtarkelime" text="TEST"/>
+                        <input type="submit" value="Arama Yap" onclick="veriAra();"/>
+                    </form>
+
+                </div>
+                <p>Veri Listesi</p>
+                <div id="veriBilgi"></div>
+                <br>
+                <input type="button" value="Verileri Getir" onclick="verileriYukle();"/>
+
+            </div>
+            <br>
+            <br>
+            <br>
+            <div id="veriEkle" style="border: mediumslateblue 5px solid">Veri Ekle
+                <br>
+                <br>
+                <label for="ad">Ad</label><br>
+                <input type="text" id="ad" name="ad" placeholder="ad"><br>
+                <label for="soyad">Soyad</label><br>
+                <input type="text" id="soyad" name="soyad" placeholder="soyad"><br>
+                <label for="yas">Yaş</label><br>
+                <input type="text" id="yas" name="yas" placeholder="yaş"><br>
+                <label for="telefon">Telefon</label><br>
+                <input type="text" id="telefon" name="telefon" placeholder="telefon"><br><br>
+                <input type="button" value="Veri Ekle" onclick="veriEkle();"/>
+                <br>
+            </div>
+            <br>
+            <div id ="veriSil" style="border: crimson 5px solid">Veri Sil
+                <br>
+                <br>
+                <label for="id">ID</label><br>
+                <input type="text" id="id" name="id" placeholder="ID"><br>
+                <input type="button" value="Veri Sil" onclick="veriSil();"/>
+            </div>
+            <br>
+            <br>
+            <div id="veriGuncelle" style="border: #e8c95f 5px solid">Veri Güncelle
+                <br>
+                <br>
+                <label for="id">Id</label><br>
+                <input type="text" id="guncelid" disabled="true"><br>
+                <label for="ad">Ad</label><br>
+                <input type="text" id="guncelad" name="ad" placeholder="ad"><br>
+                <label for="soyad">Soyad</label><br>
+                <input type="text" id="guncelsoyad" name="soyad" placeholder="soyad"><br>
+                <label for="yas">Yaş</label><br>
+                <input type="text" id="guncelyas" name="yas" placeholder="yaş"><br>
+                <label for="telefon">Telefon</label><br>
+                <input type="text" id="gunceltelefon" name="telefon" placeholder="telefon"><br><br>
+                <input type="button" value="Veri Güncelle" onclick="veriGuncelle(); " />
+                <br>
+
+
+            </div>
+
+        </div>
+
+    </body>
+</html>
